@@ -18,32 +18,28 @@ document.getElementById( 'files' ).addEventListener( 'change',
 	handleFileSelect, false);
 
 
+var mesh = null;
+
 function handleFileSelect( evt ){
 	var files = evt.target.files; //FileList object
 	var file = files[0]; //Select First File
 
 	console.log( file );
 
-	//Read in file as a binary string.
+	//Read in file as a array buffer, then convert it to Node Buffer to feed into parseSTL.
 	var reader = new FileReader();
 
 	reader.onload = function(e) {
   	var arrayBuffer = reader.result;
-  	console.log( 'e', arrayBuffer );
 
   	var buf = Buffer.from( arrayBuffer );
-  	console.log( 'f', buf );
 
-  	var mesh = parseSTL( buf );
-  	console.log( 'd', mesh );
-
+  	mesh = parseSTL( buf );
+  	console.log( "mesh updated." );
 	}
 
 	reader.readAsArrayBuffer( file );
 
-	console.log( 'a', reader );
-	
-	console.log( 'b', reader.result );
 
 }
 
