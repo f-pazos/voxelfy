@@ -31,11 +31,71 @@ function handleFileSelect( evt ){
 
 	reader.onload = function(e) {
   	var arrayBuffer = reader.result;
-
   	var buf = Buffer.from( arrayBuffer );
 
   	mesh = parseSTL( buf );
   	console.log( mesh );
+
+  	//Create mesh object to render in three.js
+  	var geoMesh = new THREE.Geometry();
+
+  	var coords = mesh.positions;
+
+  	var i = 0;
+
+  	var max = [0,0,0];
+
+  	//Take in 3 vertices of a triangle each iteration.
+  	while (i+2 < coords.length){
+  		var v1 = coords[i];
+  		var v2 = coords[i+1];
+  		var v3 = coords[i+2];
+
+  		var verts = [v1, v2, v3]
+
+  		//Check each vertex to keep track of maximum boudnaries.
+  		for (var a = 0; a < 3; a++){
+  			for (var j =0; j < 3; j++){
+  				if(Math.abs(verts[j][a]) > max[a] ){
+  					max[a] = Math.abs(verts[j][a]);
+  				}
+  			}
+  		}
+
+  		//Add each individual triangular face and vertex to three.js geometry.
+  		v1 = new THREE.Vector3( v1[0], v1[1], v1[2] );
+  		v2 = new THREE.Vector3( v2[0], v2[1], v2[2] );
+		v3 = new THREE.Vector3( v3[0], v3[1], v3[2] );
+
+		geoMesh.vertices.push( v1 );
+		geoMesh.vertices.push( v2 );
+		geoMesh.vertices.push( v3 );
+
+		geoMesh.faces.push( new THREE.Face3( i, i+1, i+2 ) );
+
+		//increment loop.
+  		i += 3
+  		}
+
+  	geoMesh.computeFaceNormals();
+  	geoMesh.computeVertexNormals();
+
+
+
+  	//Create geometry from Mesh.
+	var threeGeometry = new THREE.Mesh( geoMesh, new THREE.MeshNormalMaterial() );
+
+	console.log( scene );
+
+	//Remove any object from the scene and add ours.
+	scene.children = [];
+	scene.add( threeGeometry );
+
+	  //Find the actual max from the mesh, and rescale camera accordingly.
+  	var largestDimension = Math.max( max[0], max[1], max[2] );
+	camera.position.z = 3 * largestDimension;
+	console.log( camera );
+
 	}
 
 	reader.readAsArrayBuffer( file );
@@ -49,25 +109,26 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
 var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-var material = new THREE.MeshNormalMaterial( {color: 0x00ff00 } );
+var material = new THREE.MeshNormalMaterial();
 
 
-var cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+var sceneObject = new THREE.Mesh( geometry, material );
+scene.add( sceneObject );
 
 camera.position.z = 5;
+
+render();
 
 function render(){
 
 	requestAnimationFrame( render );
 
-	cube.rotation.x += 0.03;
-	cube.rotation.y += 0.03;
+	scene.children[0].rotation.x += 0.01;
+	scene.children[0].rotation.y += 0.01;
 
 	renderer.render( scene, camera );
 };
 
-render();
 
 /*var buf = fs.readFileSync('mesh.stl');
 var mesh = parseSTL(buf);*/
