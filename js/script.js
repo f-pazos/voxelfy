@@ -5,13 +5,7 @@
 'use strict';
 
 var parseSTL = require('parse-stl');
-/*var fs = require( 'fs' )
 
-var buf = fs.readFileSync( 'mesh.stl' );
-
-console.log( buf );
-
-var mesh = parseSTL( buf );*/
 
 //Set JS to handleFileSelect when file input changes.
 document.getElementById( 'files' ).addEventListener( 'change', 
@@ -19,6 +13,10 @@ document.getElementById( 'files' ).addEventListener( 'change',
 
 
 var mesh = null;
+
+/********************************/
+/* Handle new file selection.   */
+/********************************/
 
 function handleFileSelect( evt ){
 	var files = evt.target.files; //FileList object
@@ -85,52 +83,87 @@ function handleFileSelect( evt ){
   	//Create geometry from Mesh.
 	var threeGeometry = new THREE.Mesh( geoMesh, new THREE.MeshNormalMaterial() );
 
-	console.log( scene );
+	console.log( stlScene );
 
 	//Remove any object from the scene and add ours.
-	scene.children = [];
-	scene.add( threeGeometry );
+	stlScene.children = [];
+	stlScene.add( threeGeometry );
 
 	  //Find the actual max from the mesh, and rescale camera accordingly.
-  	var largestDimension = Math.max( max[0], max[1], max[2] );
-	camera.position.z = 3 * largestDimension;
-	console.log( camera );
+  var largestDimension = Math.max( max[0], max[1], max[2] );
+	stlCamera.position.z = 3 * largestDimension;
 
 	}
 
 	reader.readAsArrayBuffer( file );
 }
 
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+/***************************************/
+/* Create scene to render STL preview. */
+/***************************************/
 
-var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-var material = new THREE.MeshNormalMaterial();
+//Create a THREE.js scene to render the STL file.
+
+var stlScene = new THREE.Scene();
+var stlCamera = new THREE.PerspectiveCamera( 75, ( (window.innerWidth / 2)* .9 ) / window.innerHeight, 0.1, 1000 );
+
+var stlRenderer = new THREE.WebGLRenderer();
+//Set width to 90 percent of half the screen.
+stlRenderer.setSize( (window.innerWidth/2) * .9, window.innerHeight );
+document.body.appendChild( stlRenderer.domElement );
+
+var stlGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+var stlMaterial = new THREE.MeshNormalMaterial();
 
 
-var sceneObject = new THREE.Mesh( geometry, material );
-scene.add( sceneObject );
+var stlObject = new THREE.Mesh( stlGeometry, stlMaterial );
+stlScene.add( stlObject );
 
-camera.position.z = 5;
+stlCamera.position.z = 5;
 
-render();
+renderSTL();
 
-function render(){
+function renderSTL(){
 
-	requestAnimationFrame( render );
+	requestAnimationFrame( renderSTL );
 
-	scene.children[0].rotation.x += 0.01;
-	scene.children[0].rotation.y += 0.01;
+	stlScene.children[0].rotation.x += 0.01;
+	stlScene.children[0].rotation.y += 0.01;
 
-	renderer.render( scene, camera );
+	stlRenderer.render( stlScene, stlCamera );
 };
 
 
-/*var buf = fs.readFileSync('mesh.stl');
-var mesh = parseSTL(buf);*/
+/***********************************************/
+/* Create second scene to render voxel output. */
+/***********************************************/
 
+var voxScene = new THREE.Scene();
+var voxCamera = new THREE.PerspectiveCamera( 75, ( (window.innerWidth / 2) * .9 ) / window.innerHeight, 0.1, 1000 );
 
+var voxRenderer = new THREE.WebGLRenderer();
+
+voxRenderer.setSize( (window.innerWidth/2) * .9, window.innerHeight );
+document.body.appendChild( voxRenderer.domElement );
+
+var voxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+var voxMaterial = new THREE.MeshNormalMaterial();
+
+var voxObject = new THREE.Mesh( voxGeometry, voxMaterial );
+voxScene.add( voxObject );
+
+voxCamera.position.z = 7;
+
+renderVOX();
+
+function renderVOX(){
+
+  requestAnimationFrame( renderVOX );
+
+  voxScene.children[0].rotation.x += 0.01;
+  voxScene.children[0].rotation.y -= 0.01;
+
+  voxRenderer.render( voxScene, voxCamera );
+
+}
