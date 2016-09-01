@@ -106,11 +106,11 @@ function handleFileSelect( evt ){
 //Create a THREE.js scene to render the STL file.
 
 var stlScene = new THREE.Scene();
-var stlCamera = new THREE.PerspectiveCamera( 75, ( (window.innerWidth / 2)* .9 ) / window.innerHeight, 0.1, 1000 );
+var stlCamera = new THREE.PerspectiveCamera( 75, window.innerWidth  / window.innerHeight, 0.1, 1000 );
 
 var stlRenderer = new THREE.WebGLRenderer();
 //Set width to 90 percent of half the screen.
-stlRenderer.setSize( (window.innerWidth/2) * .9, window.innerHeight );
+stlRenderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( stlRenderer.domElement );
 
 var stlGeometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -140,11 +140,11 @@ function renderSTL(){
 /***********************************************/
 
 var voxScene = new THREE.Scene();
-var voxCamera = new THREE.PerspectiveCamera( 75, ( (window.innerWidth / 2) * .9 ) / window.innerHeight, 0.1, 1000 );
+var voxCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 var voxRenderer = new THREE.WebGLRenderer();
 
-voxRenderer.setSize( (window.innerWidth/2) * .9, window.innerHeight );
+voxRenderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( voxRenderer.domElement );
 
 var voxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
